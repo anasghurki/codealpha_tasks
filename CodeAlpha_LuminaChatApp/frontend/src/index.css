@@ -1,0 +1,186 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --primary: #7c3aed; /* Purple like in the image */
+  --primary-light: #f5f3ff;
+  --bg-main: #ffffff;
+  --bg-side: #fcfcfd;
+  --text-main: #1f2937;
+  --text-muted: #6b7280;
+  --border: #f3f4f6;
+  --shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+}
+
+/* GLOBAL RESET */
+body {
+  @apply bg-white text-gray-900;
+  font-family: 'Inter', sans-serif !important;
+}
+
+/* STREAM CHAT CUSTOMIZATION - MATCHING THE IMAGE */
+
+/* THE CHANNEL CONTAINER */
+.str-chat__channel {
+  background-color: white !important;
+  background-image: none !important;
+}
+
+.str-chat__container {
+  background-color: white !important;
+}
+
+/* HEADER STYLE - CLEAN & MINIMAL */
+.str-chat__header {
+  background: white !important;
+  border-bottom: 1px solid var(--border) !important;
+  height: 80px !important;
+  padding: 0 32px !important;
+  box-shadow: none !important;
+}
+
+.str-chat__header--title {
+  color: #111827 !important;
+  font-weight: 700 !important;
+  font-size: 1.1rem !important;
+}
+
+/* MESSAGE LIST BRACING */
+.str-chat__list {
+  background-color: white !important;
+}
+
+/* MESSAGE BUBBLES */
+.str-chat__message-simple {
+  padding: 8px 32px !important;
+}
+
+/* Reset outer bubble backgrounds in case Stream Chat adds default ones */
+.str-chat__message-text, 
+.str-chat__message-simple__inner {
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+  padding: 0 !important;
+}
+
+.str-chat__message-simple-text-inner {
+  border-radius: 20px !important;
+  padding: 12px 18px !important;
+  font-size: 0.95rem !important;
+  border: none !important;
+  box-shadow: none !important;
+  width: fit-content !important;
+  min-width: 20px !important;
+  word-break: break-word !important;
+  white-space: normal !important;
+  display: inline-block !important;
+}
+
+/* MY MESSAGES - PURPLE GRADIENT */
+.str-chat__message-simple--me .str-chat__message-simple-text-inner {
+  background: linear-gradient(135deg, #a78bfa 0%, #7c3aed 100%) !important;
+  color: white !important;
+  border-bottom-right-radius: 4px !important;
+}
+
+/* OTHER MESSAGES - SOFT GRAY */
+.str-chat__message-simple--other .str-chat__message-simple-text-inner {
+  background: #f3f4f6 !important;
+  color: #1f2937 !important;
+  border-bottom-left-radius: 4px !important;
+}
+
+/* DATE SEPARATOR */
+.str-chat__date-separator {
+  margin: 32px 0 !important;
+}
+
+.str-chat__date-separator-line {
+  background-color: var(--border) !important;
+}
+
+.str-chat__date-separator-date {
+  color: var(--text-muted) !important;
+  font-weight: 600 !important;
+  font-size: 0.75rem !important;
+  text-transform: uppercase !important;
+  letter-spacing: 0.05em !important;
+}
+
+/* INPUT AREA - FLOATING PILL LIKE IMAGE */
+.str-chat__message-input {
+  background: white !important;
+  padding: 24px 32px !important;
+  border-top: 1px solid var(--border) !important;
+}
+
+.str-chat__message-input-inner {
+  background: #f9fafb !important;
+  border: 1px solid #f3f4f6 !important;
+  border-radius: 30px !important;
+  padding: 10px 20px !important;
+  transition: all 0.2s ease !important;
+}
+
+.str-chat__message-input-inner:focus-within {
+  background: white !important;
+  border-color: var(--primary) !important;
+  box-shadow: 0 0 0 4px rgba(124, 58, 237, 0.1) !important;
+}
+
+.str-chat__send-button {
+  color: var(--primary) !important;
+  fill: var(--primary) !important;
+}
+
+/* TYPING INDICATOR */
+.str-chat__typing-indicator {
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+  color: #a78bfa !important;
+  font-size: 0.8rem !important;
+  font-style: italic !important;
+  padding: 0 32px !important;
+  margin-bottom: 8px !important;
+}
+
+/* SCROLLBARS */
+::-webkit-scrollbar {
+  width: 5px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #e5e7eb;
+  border-radius: 10px;
+}
+
+/* CUSTOM COMPONENTS - SIDEBAR & HOME */
+.glass-effect {
+  @apply bg-white/80 backdrop-blur-md border border-white/20;
+}
+
+.card-purple {
+  @apply bg-white rounded-3xl p-6 border border-gray-100 shadow-sm hover:shadow-xl hover:border-purple-100 transition-all duration-300;
+}
+
+.btn-purple {
+  @apply bg-[#7c3aed] hover:bg-[#6d28d9] text-white font-bold rounded-2xl shadow-lg transition-all transform active:scale-95;
+}
+
+.animate-shake {
+  animation: shake 0.5s cubic-bezier(.36,.07,.19,.97) both;
+}
+
+@keyframes shake {
+  10%, 90% { transform: translate3d(-1px, 0, 0); }
+  20%, 80% { transform: translate3d(2px, 0, 0); }
+  30%, 50%, 70% { transform: translate3d(-4px, 0, 0); }
+  40%, 60% { transform: translate3d(4px, 0, 0); }
+}

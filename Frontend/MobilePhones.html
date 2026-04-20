@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mobile Phones Collection | TECNIFY</title>
+    <link href="https://fonts.googleapis.com/css2?family=Anton&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <nav></nav>
+    <div class="shop-header"><h1>Smartphones</h1></div>
+    <div class="shop-container" style="grid-template-columns: 1fr;">
+        <main class="shop-main"><div class="products-grid" id="categoryProducts"></div></main>
+    </div>
+    <footer></footer>
+    <script src="common.js"></script>
+    <script>
+        async function loadCollection() {
+            const products = await fetchProductsByCategory('Mobile Phones');
+            const grid = document.getElementById('categoryProducts');
+            grid.innerHTML = products.length ? products.map(p => createProductCard(p)).join('') : '<p style="text-align: center; padding: 50px;">No smartphones found.</p>';
+            lucide.createIcons();
+        }
+        window.addEventListener('DOMContentLoaded', loadCollection);
+    </script>
+</body>
+</html>

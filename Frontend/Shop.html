@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Shop | TECNIFY Electronics</title>
+   
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Anton&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+   
+    <script src="https://unpkg.com/lucide@latest"></script>
+  
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <!-- Header / Navbar -->
+    <nav>
+        <div class="nav-links">
+            <a href="index.html">Home</a>
+            <a href="Shop.html">Shop</a>
+            <a href="#">Collections</a>
+            <a href="#">About Us</a>
+        </div>
+        <div class="logo">
+            <img src="Technify-removebg-preview.png" alt="Tecnify Logo" style="height: 150px;">
+        </div>
+        <div class="nav-icons">
+            <i data-lucide="search"></i>
+            <i data-lucide="user"></i>
+            <i data-lucide="shopping-bag" style="color: #ff0000;"></i>
+        </div>
+    </nav>
+
+    <div class="shop-header">
+        <h1>Explore Collection</h1>
+        <p style="margin-top: 10px; color: var(--text-muted);">Premium electronics curated for your lifestyle.</p>
+    </div>
+
+  
+    <div class="shop-container">
+        
+      
+        <aside class="filter-sidebar">
+            <div class="filter-group">
+                <h4 style="display: flex; justify-content: space-between; align-items: center;">
+                    Categories 
+                    <i data-lucide="chevron-down" style="width: 16px;"></i>
+                </h4>
+                <div class="filter-list" id="sidebarCategoryList">
+                    <div class="filter-item active" onclick="filterByCategory('All', this)">
+                        <span>All Products</span>
+                        <span id="allCount">(0)</span>
+                    </div>
+                   
+                </div>
+            </div>
+
+            <div class="filter-group">
+                <h4>Price Range</h4>
+                <div class="price-inputs">
+                    <input type="number" id="minPrice" placeholder="Min $" onchange="applyFilters()">
+                    <input type="number" id="maxPrice" placeholder="Max $" onchange="applyFilters()">
+                </div>
+            </div>
+
+            <div class="filter-group">
+                <h4>Quick Search</h4>
+                <div class="search-wrapper">
+                    <input type="text" id="shopSearch" placeholder="Search product..." oninput="applyFilters()">
+                    <i data-lucide="search"></i>
+                </div>
+            </div>
+
+            <div class="filter-group" style="border: none;">
+                <button class="btn btn-outline" style="width: 100%; font-size: 11px;" onclick="resetFilters()">Clear All Filters</button>
+            </div>
+        </aside>
+
+        <!-- Product Grid Area -->
+        <main class="shop-main">
+            <div class="shop-controls">
+                <span id="resultCount" style="font-weight: 600; font-size: 14px;">0 Products Found</span>
+                <div style="display: flex; align-items: center; gap: 15px;">
+                    <span style="font-size: 13px; color: #888;">Sort by:</span>
+                    <select class="sort-select" id="sortSelect" onchange="applyFilters()">
+                        <option value="featured">Featured</option>
+                        <option value="newest">Newest Arrivals</option>
+                        <option value="price-low">Price: Low to High</option>
+                        <option value="price-high">Price: High to Low</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="products-grid" id="shopGrid">
+                <!-- Products loaded via JS -->
+            </div>
+        </main>
+    </div>
+
+    <footer></footer>
+
+    <script src="common.js"></script>
+    <script>
+        let allProducts = [];
+        let currentCategory = 'All';
+
+        async function initShop() {
+            allProducts = await fetchAllProducts();
+            await loadSidebarCategories();
+            applyFilters();
+        }
+
+        async function loadSidebarCategories() {
+            try {
+                const response = await fetch('http://localhost:5000/api/categories');
+                const categories = await response.json();
+                const list = document.getElementById('sidebarCategoryList');
+                
+                document.getElementById('allCount').textContent = `(${allProducts.length})`;
+                
+                categories.forEach(cat => {
+                    const count = allProducts.filter(p => p.category_id === cat.id).length;
+                    list.innerHTML += `
+                        <div class="filter-item" onclick="filterByCategory('${cat.name}', this)">
+                            <span>${cat.name}</span>
+                            <span>(${count})</span>
+                        </div>
+                    `;
+                });
+            } catch (err) { console.error(err); }
+        }
+
+        function filterByCategory(name, el) {
+            currentCategory = name;
+            document.querySelectorAll('.filter-item').forEach(i => i.classList.remove('active'));
+            el.classList.add('active');
+            applyFilters();
+        }
+
+        function applyFilters() {
+            let filtered = [...allProducts];
+
+         
+            if (currentCategory !== 'All') {
+                filtered = filtered.filter(p => p.category_name === currentCategory);
+            }
+
+        
+            const searchQuery = document.getElementById('shopSearch').value.toLowerCase();
+            if (searchQuery) {
+                filtered = filtered.filter(p => p.name.toLowerCase().includes(searchQuery));
+            }
+
+           
+            const min = parseFloat(document.getElementById('minPrice').value) || 0;
+            const max = parseFloat(document.getElementById('maxPrice').value) || Infinity;
+            filtered = filtered.filter(p => p.price >= min && p.price <= max);
+
+        
+            const sort = document.getElementById('sortSelect').value;
+            if (sort === 'price-low') filtered.sort((a, b) => a.price - b.price);
+            else if (sort === 'price-high') filtered.sort((a, b) => b.price - a.price);
+            else if (sort === 'newest') filtered.sort((a, b) => b.id - a.id);
+
+            renderShopGrid(filtered);
+        }
+
+        function renderShopGrid(products) {
+            const grid = document.getElementById('shopGrid');
+            const countLabel = document.getElementById('resultCount');
+            
+            countLabel.textContent = `${products.length} Products Found`;
+            
+            if (products.length === 0) {
+                grid.innerHTML = '<div style="grid-column: span 3; text-align: center; padding: 100px; color: #999;"><h3>No products match your filters.</h3></div>';
+            } else {
+                grid.innerHTML = products.map(p => createProductCard(p)).join('');
+            }
+            lucide.createIcons();
+        }
+
+        function resetFilters() {
+            document.getElementById('minPrice').value = '';
+            document.getElementById('maxPrice').value = '';
+            document.getElementById('shopSearch').value = '';
+            document.getElementById('sortSelect').value = 'featured';
+            filterByCategory('All', document.querySelector('.filter-item'));
+        }
+
+        window.onload = initShop;
+    </script>
+</body>
+</html>

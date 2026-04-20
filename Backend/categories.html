@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Categories Management | TECNIFY</title>
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <link rel="stylesheet" href="admin_style.css">
+    <script src="admin_common.js" defer></script>
+</head>
+<body>
+
+    <aside class="sidebar"></aside>
+
+    <main class="main-content">
+        <header class="header">
+            <div>
+                <h2>Categories</h2>
+                <p style="color: var(--text-muted); font-size: 14px;">Organize your products into logical groups.</p>
+            </div>
+        </header>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 30px;">
+            <!-- Category List -->
+            <div class="card">
+                <h3>Current Categories</h3>
+                <div style="margin-top: 20px;">
+                    <table style="width: 100%;">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>CATEGORY NAME</th>
+                                <th>ACTION</th>
+                            </tr>
+                        </thead>
+                        <tbody id="categoryTableBody">
+                            <!-- Categories will load here -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Add Helper -->
+            <div class="card" style="align-self: flex-start;">
+                <h3>Quick Add Category</h3>
+                <form id="addCategoryForm" style="margin-top: 25px;">
+                    <div class="form-group">
+                        <label>Category Name</label>
+                        <input type="text" id="catName" name="name" required placeholder="e.g. Smart Home">
+                    </div>
+                    <button type="submit" class="btn btn-primary" style="width: 100%;">Create Category</button>
+                </form>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        const API_URL = 'http://localhost:5000/api';
+        lucide.createIcons();
+
+        async function loadCategories() {
+            try {
+                const response = await fetch(`${API_URL}/categories`);
+                const categories = await response.json();
+                
+                const tableBody = document.getElementById('categoryTableBody');
+                tableBody.innerHTML = '';
+                
+                categories.forEach(cat => {
+                    const row = `
+                        <tr>
+                            <td>#${cat.id}</td>
+                            <td><strong>${cat.name}</strong></td>
+                            <td>
+                                <button onclick="deleteCategory(${cat.id})" style="background:none; border:none; cursor:pointer;">
+                                    <i data-lucide="trash" style="width: 18px; color: var(--danger);"></i>
+                                </button>
+                            </td>
+                        </tr>
+                    `;
+                    tableBody.innerHTML += row;
+                });
+                lucide.createIcons();
+            } catch (err) {
+                console.error('Error loading categories:', err);
+            }
+        }
+
+        document.getElementById('addCategoryForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const name = document.getElementById('catName').value;
+            console.log('Attempting to add category:', name);
+            
+            try {
+                const response = await fetch(`${API_URL}/categories`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ name })
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok) {
+                    alert('✅ Category added successfully!');
+                    document.getElementById('catName').value = '';
+                    loadCategories();
+                } else {
+                    alert('❌ Error: ' + (data.error || 'Server error'));
+                }
+            } catch (err) {
+                console.error('Error adding category:', err);
+                alert('❌ Connection failed! Make sure your backend server is running (npm run dev).');
+            }
+        });
+
+        async function deleteCategory(id) {
+            if (!confirm('Are you sure? This might affect products in this category.')) return;
+            try {
+                const response = await fetch(`${API_URL}/categories/${id}`, {
+                    method: 'DELETE'
+                });
+                if (response.ok) loadCategories();
+            } catch (err) {
+                console.error('Error deleting category:', err);
+            }
+        }
+
+        window.onload = loadCategories;
+    </script>
+</body>
+</html>

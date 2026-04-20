@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Headphones Collection | TECNIFY</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Anton&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <nav></nav>
+
+    <div class="shop-header">
+        <h1>Headphones</h1>
+        <p style="margin-top: 10px; color: var(--text-muted);">Explore our premium audio collection</p>
+    </div>
+
+    <div class="shop-container" style="grid-template-columns: 1fr;">
+        <main class="shop-main">
+            <div class="products-grid" id="categoryProducts">
+               
+            </div>
+        </main>
+    </div>
+
+    <footer></footer>
+
+    <script src="common.js"></script>
+    <script>
+        async function loadCollection() {
+            const products = await fetchProductsByCategory('Headphones');
+            const grid = document.getElementById('categoryProducts');
+            
+            if (products.length === 0) {
+                grid.innerHTML = '<p style="text-align: center; padding: 50px;">No headphones found in this collection yet.</p>';
+            } else {
+                grid.innerHTML = products.map(p => createProductCard(p)).join('');
+            }
+            lucide.createIcons();
+        }
+        window.addEventListener('DOMContentLoaded', loadCollection);
+    </script>
+</body>
+</html>

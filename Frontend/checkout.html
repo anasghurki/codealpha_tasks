@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Checkout | TECNIFY</title>
+    <link href="https://fonts.googleapis.com/css2?family=Anton&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        .checkout-body { padding: 80px 5%; max-width: 1200px; margin: 0 auto; display: grid; grid-template-columns: 1fr 400px; gap: 80px; }
+        .checkout-form section { margin-bottom: 50px; }
+        .checkout-form h3 { font-family: var(--font-heading); text-transform: uppercase; margin-bottom: 25px; border-bottom: 1px solid var(--border); padding-bottom: 10px; }
+        .input-row { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+        .form-group { margin-bottom: 20px; }
+        .form-group label { display: block; margin-bottom: 8px; font-weight: 500; font-size: 14px; color: var(--text-muted); }
+        .form-group input { width: 100%; padding: 15px; border: 1px solid var(--border); border-radius: 8px; }
+        .order-summary-box { background: #f9f9f9; padding: 40px; border-radius: 20px; }
+        .order-item-mini { display: flex; justify-content: space-between; margin-bottom: 15px; font-size: 14px; }
+
+        @media (max-width: 1024px) {
+            .checkout-body { grid-template-columns: 1fr; gap: 40px; padding: 40px 5%; }
+            .order-summary-box { order: -1; } 
+        }
+
+        @media (max-width: 600px) {
+            .input-row { grid-template-columns: 1fr; }
+            .order-summary-box { padding: 25px; }
+            .checkout-form h3 { font-size: 20px; }
+        }
+    </style>
+</head>
+<body>
+    <nav></nav>
+
+    <div class="checkout-body">
+        <form class="checkout-form" id="checkoutForm" onsubmit="handlePlaceOrder(event)">
+            <section>
+                <h3>Contact Information</h3>
+                <div class="form-group"><label>Email Address</label><input type="email" id="email" required placeholder="you@example.com"></div>
+                <div class="form-group"><label>Phone Number</label><input type="tel" id="phone" required placeholder="+1 (234) 567-890"></div>
+            </section>
+
+            <section>
+                <h3>Shipping Address</h3>
+                <div class="input-row">
+                    <div class="form-group"><label>First Name</label><input type="text" id="fname" required></div>
+                    <div class="form-group"><label>Last Name</label><input type="text" id="lname" required></div>
+                </div>
+                <div class="form-group"><label>Address</label><input type="text" id="address" required placeholder="Street address, apartment, etc."></div>
+                <div class="input-row">
+                    <div class="form-group"><label>City</label><input type="text" id="city" required></div>
+                    <div class="form-group"><label>Postal Code</label><input type="text" id="zip" required></div>
+                </div>
+            </section>
+
+            <section>
+                <h3>Payment Method</h3>
+                <div style="padding: 24px; border: 2px solid black; border-radius: 12px; background: #f0f0f0; display: flex; justify-content: space-between; align-items: center; cursor: pointer;">
+                    <div style="display: flex; align-items: center; gap: 15px;">
+                        <i data-lucide="truck"></i>
+                        <div>
+                            <span style="font-weight: 700; display: block;">Cash on Delivery (COD)</span>
+                            <span style="font-size: 12px; color: #666;">Pay when your package arrives.</span>
+                        </div>
+                    </div>
+                    <span style="font-size: 20px; font-weight: bold;">✔</span>
+                </div>
+            </section>
+
+            <button type="submit" id="submitBtn" class="btn btn-black" style="width: 100%; font-size: 18px; padding: 25px;">Place Your Order</button>
+        </form>
+
+        <div class="order-summary-box">
+            <h3 style="margin-bottom: 30px; font-family: var(--font-heading);">Order Summary</h3>
+            <div id="orderItems"></div>
+            <div style="border-top: 1px solid var(--border); margin-top: 20px; padding-top: 20px; display: flex; flex-direction: column; gap: 10px;">
+                <div style="display: flex; justify-content: space-between; font-size: 14px; color: #666;"><span>Subtotal</span><span id="subtotalCost">$0.00</span></div>
+                <div style="display: flex; justify-content: space-between; font-size: 14px; color: #666;"><span>Shipping</span><span>Free</span></div>
+                <div style="display: flex; justify-content: space-between; font-weight: 700; font-size: 22px; margin-top: 10px; padding-top: 10px; border-top: 1px solid #eee;">
+                    <span>Total Cost</span>
+                    <span id="finalTotal">$0.00</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer></footer>
+
+    <script src="common.js"></script>
+    <script>
+        let fullTotalAmount = 0;
+
+        function loadOrderSummary() {
+            const cart = getCart();
+            if (cart.length === 0) {
+                window.location.href = 'Shop.html';
+                return;
+            }
+
+            let total = 0;
+            const container = document.getElementById('orderItems');
+            container.innerHTML = cart.map(item => {
+                const sub = item.price * item.quantity;
+                total += sub;
+                return `
+                    <div class="order-item-mini">
+                        <span>${item.name} x ${item.quantity}</span>
+                        <span>$${sub.toFixed(2)}</span>
+                    </div>
+                `;
+            }).join('');
+
+            fullTotalAmount = total;
+            document.getElementById('subtotalCost').textContent = `$${total.toFixed(2)}`;
+            document.getElementById('finalTotal').textContent = `$${total.toFixed(2)}`;
+            lucide.createIcons();
+
+           
+            const user = JSON.parse(localStorage.getItem('user'));
+            if (user) {
+                document.getElementById('fname').value = user.name.split(' ')[0] || '';
+                document.getElementById('lname').value = user.name.split(' ').slice(1).join(' ') || '';
+            }
+        }
+
+        async function handlePlaceOrder(e) {
+            e.preventDefault();
+            const btn = document.getElementById('submitBtn');
+            btn.disabled = true;
+            btn.textContent = 'Processing...';
+
+            const cart = getCart();
+            const orderData = {
+                customer_name: document.getElementById('fname').value + ' ' + document.getElementById('lname').value,
+                customer_email: document.getElementById('email').value,
+                customer_phone: document.getElementById('phone').value,
+                shipping_address: document.getElementById('address').value + ', ' + document.getElementById('city').value + ' ' + document.getElementById('zip').value,
+                total_amount: fullTotalAmount,
+                items: cart
+            };
+
+            try {
+                const response = await fetch('http://localhost:5000/api/orders', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(orderData)
+                });
+
+                if (response.ok) {
+                    alert('🎉 Order Placed Successfully! We will contact you soon for confirmation.');
+                    localStorage.removeItem('cart');
+                    window.location.href = 'index.html';
+                } else {
+                    const errData = await response.json();
+                    alert(`❌ Order Failed: ${errData.error || 'Please try again.'}`);
+                }
+            } catch (err) {
+                console.error(err);
+                alert('❌ Connection Error. Please check your server.');
+            } finally {
+                btn.disabled = false;
+                btn.textContent = 'Place Your Order';
+            }
+        }
+
+        window.onload = loadOrderSummary;
+    </script>
+</body>
+</html>

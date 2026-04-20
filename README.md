@@ -45,7 +45,7 @@ Real-Time: Stream SDK & WebRTC
 🌟 Conclusion
 This internship has been an incredible journey of learning and growth. From handling complex database schemas to implementing real-time media streaming, these tasks have significantly sharpened my full-stack capabilities. 📈
 
-Anas Ghurki
+Anas Javaid
 Full Stack Development Intern | CodeAlpha
 Passionate about building scalable web solutions. 🚀
 

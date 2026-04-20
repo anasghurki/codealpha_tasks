@@ -53,7 +53,7 @@ Start the server: node server.js
 Open index.html in your browser.
 
 📧 Contact & Submission
-Intern Name: [Anas Ghurki]
+Intern Name: [Anas javaid]
 
 Internship Domain: Full Stack Web Development
 
